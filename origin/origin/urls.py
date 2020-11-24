@@ -21,5 +21,5 @@ from bonds.views import HelloWorld, Bonds
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HelloWorld.as_view()),
-    path('bonds/', Bonds.as_view())
+    path('bonds/', Bonds.as_view(), name='bonds')
 ]

@@ -23,6 +23,12 @@ class Bonds(APIView):
 
     def get(self, request):
         bonds = Bond.objects.all()
+        params = {param.name: self.request.query_params.get(param.name, None) for param in Bond._meta.get_fields() if
+                  self.request.query_params.get(param.name, None) != None}
+
+        if bool(dict):
+            bonds = bonds.filter(**params)
+
         serializer = BondSerializer(bonds, many=True)
         return Response(serializer.data)
 
@@ -38,9 +44,10 @@ class Bonds(APIView):
         except:
             print("Couldn't dispatch Legal Name from request.")
 
-        request.data['legal_name'] = legal_name
-        serializer = BondSerializer(data=request.data)
-        if serializer.is_valid():
+        data = request.data.copy()
+        data['legal_name'] = legal_name
+        serializer = BondSerializer(data=data)
+        if serializer.is_valid() and legal_name != 'Invalid Name':
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
